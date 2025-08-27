@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyInstagram());
+  runApp(const MyInstagram());
 }
 
 class MyInstagram extends StatefulWidget {
+  const MyInstagram({Key? key}) : super(key: key);
+
   @override
-  _MyInstagramState createState() => _MyInstagramState();
+  State<MyInstagram> createState() => _MyInstagramState();
 }
 
 class _MyInstagramState extends State<MyInstagram> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
+  final List<Widget> _pages = const [
     HomePage(),
     SearchPage(),
     ReelsPage(),
@@ -28,26 +30,32 @@ class _MyInstagramState extends State<MyInstagram> {
       theme: ThemeData.light(),
       home: Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             "Instagram",
             style: TextStyle(
-              fontFamily: 'Billabong', // Instagram style font qo‘yish mumkin
-              fontSize: 28,
+              fontFamily: 'Billabong',
+              fontSize: 32,
             ),
           ),
           centerTitle: false,
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           elevation: 1,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.favorite_border),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.send),
+              onPressed: () {},
+            ),
+          ],
         ),
         body: _pages[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
+          onTap: (index) => setState(() => _selectedIndex = index),
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Colors.black,
           unselectedItemColor: Colors.grey,
@@ -66,28 +74,73 @@ class _MyInstagramState extends State<MyInstagram> {
 
 // === Home Page ===
 class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: [
-        PostWidget(
-          username: "flutter_dev",
-          image: "assets/images/post1.jpg",
-        ),
-        PostWidget(
-          username: "openai",
-          image: "assets/images/post2.jpg",
-        ),
+      children: const [
+        StoryBar(),
+        Divider(height: 1),
+        PostWidget(username: "flutter_dev", image: "assets/images/post1.jpg"),
+        PostWidget(username: "openai", image: "assets/images/post2.jpg"),
       ],
     );
   }
 }
 
-class PostWidget extends StatelessWidget {
+// === Story Bar ===
+class StoryBar extends StatelessWidget {
+  const StoryBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> users = ["me", "flutter", "dart", "openai", "google", "apple"];
+
+    return SizedBox(
+      height: 100,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.all(8),
+        itemCount: users.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 32,
+                  backgroundColor: Colors.purple,
+                  child: CircleAvatar(
+                    radius: 29,
+                    backgroundImage: AssetImage("assets/images/avatar.png"),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(users[index], style: const TextStyle(fontSize: 12)),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// === Post Widget ===
+class PostWidget extends StatefulWidget {
   final String username;
   final String image;
 
-  PostWidget({required this.username, required this.image});
+  const PostWidget({Key? key, required this.username, required this.image})
+      : super(key: key);
+
+  @override
+  State<PostWidget> createState() => _PostWidgetState();
+}
+
+class _PostWidgetState extends State<PostWidget> {
+  bool isLiked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -95,27 +148,38 @@ class PostWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListTile(
-          leading: CircleAvatar(
+          leading: const CircleAvatar(
             backgroundImage: AssetImage("assets/images/avatar.png"),
           ),
-          title: Text(username, style: TextStyle(fontWeight: FontWeight.bold)),
-          trailing: Icon(Icons.more_vert),
+          title: Text(widget.username,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          trailing: const Icon(Icons.more_vert),
         ),
-        Image.asset(image, fit: BoxFit.cover),
+        Image.asset(widget.image, fit: BoxFit.cover),
         Row(
           children: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.favorite_border)),
-            IconButton(onPressed: () {}, icon: Icon(Icons.comment_outlined)),
-            IconButton(onPressed: () {}, icon: Icon(Icons.send)),
-            Spacer(),
-            IconButton(onPressed: () {}, icon: Icon(Icons.bookmark_border)),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  isLiked = !isLiked;
+                });
+              },
+              icon: Icon(
+                isLiked ? Icons.favorite : Icons.favorite_border,
+                color: isLiked ? Colors.red : Colors.black,
+              ),
+            ),
+            IconButton(onPressed: () {}, icon: const Icon(Icons.comment_outlined)),
+            IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
+            const Spacer(),
+            IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark_border)),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text("Liked by user123 and others"),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -123,18 +187,23 @@ class PostWidget extends StatelessWidget {
 
 // === Search Page ===
 class SearchPage extends StatelessWidget {
+  const SearchPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: EdgeInsets.all(2),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      padding: const EdgeInsets.all(2),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 2,
         crossAxisSpacing: 2,
       ),
       itemCount: 12,
       itemBuilder: (context, index) {
-        return Image.asset("assets/images/post${(index % 3) + 1}.jpg", fit: BoxFit.cover);
+        return Image.asset(
+          "assets/images/post${(index % 3) + 1}.jpg",
+          fit: BoxFit.cover,
+        );
       },
     );
   }
@@ -142,60 +211,108 @@ class SearchPage extends StatelessWidget {
 
 // === Reels Page ===
 class ReelsPage extends StatelessWidget {
+  const ReelsPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("📹 Reels (video page)", style: TextStyle(fontSize: 22)));
+    return const Center(
+      child: Text("📹 Reels (video page)", style: TextStyle(fontSize: 22)),
+    );
   }
 }
 
 // === Shop Page ===
 class ShopPage extends StatelessWidget {
+  const ShopPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("🛍 Shop page", style: TextStyle(fontSize: 22)));
+    return const Center(
+      child: Text("🛍 Shop page", style: TextStyle(fontSize: 22)),
+    );
   }
 }
 
 // === Profile Page ===
 class ProfilePage extends StatelessWidget {
+  const ProfilePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        SizedBox(height: 20),
-        CircleAvatar(
+        const SizedBox(height: 20),
+        const CircleAvatar(
           radius: 50,
           backgroundImage: AssetImage("assets/images/avatar.png"),
         ),
-        SizedBox(height: 10),
-        Center(
-          child: Text("Alisher", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        const Center(
+          child: Text(
+            "Alisher",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
         ),
-        Center(child: Text("Flutter Developer 🚀")),
-        SizedBox(height: 20),
+        const Center(child: Text("Flutter Developer 🚀")),
+        const SizedBox(height: 20),
+
+        // Stats
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(children: [Text("12", style: TextStyle(fontWeight: FontWeight.bold)), Text("Posts")]),
-            Column(children: [Text("500", style: TextStyle(fontWeight: FontWeight.bold)), Text("Followers")]),
-            Column(children: [Text("300", style: TextStyle(fontWeight: FontWeight.bold)), Text("Following")]),
+          children: const [
+            _ProfileStat(title: "Posts", value: "12"),
+            _ProfileStat(title: "Followers", value: "500"),
+            _ProfileStat(title: "Following", value: "300"),
           ],
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
+
+        // Edit Profile button
+        Center(
+          child: OutlinedButton(
+            onPressed: () {},
+            child: const Text("Edit Profile"),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // User posts
         GridView.builder(
-          padding: EdgeInsets.all(2),
+          padding: const EdgeInsets.all(2),
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             mainAxisSpacing: 2,
             crossAxisSpacing: 2,
           ),
           itemCount: 9,
           itemBuilder: (context, index) {
-            return Image.asset("assets/images/post${(index % 3) + 1}.jpg", fit: BoxFit.cover);
+            return Image.asset(
+              "assets/images/post${(index % 3) + 1}.jpg",
+              fit: BoxFit.cover,
+            );
           },
         ),
+      ],
+    );
+  }
+}
+
+class _ProfileStat extends StatelessWidget {
+  final String title;
+  final String value;
+
+  const _ProfileStat({Key? key, required this.title, required this.value})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(title),
       ],
     );
   }
